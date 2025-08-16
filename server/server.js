@@ -22,16 +22,10 @@ app.use(limiter);
 
 // CORS configuration
 app.use(cors({
-  origin: 'https://www.hrslifecharitabletrust.com',
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  origin: ['https://www.hrslifecharitabletrust.com', 'https://hrslifecharitabletrust.com'],
   credentials: true
 }));
 
-// Optional: handle preflight requests
-app.options('*', cors({
-  origin: 'https://www.hrslifecharitabletrust.com',
-  credentials: true
-}));
 
 // Body parser middleware
 app.use(bodyParser.json({ limit: '10mb' }));
