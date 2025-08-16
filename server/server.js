@@ -23,6 +23,7 @@ app.use(limiter);
 // CORS configuration
 app.use(cors({
   origin: ['https://www.hrslifecharitabletrust.com', 'https://hrslifecharitabletrust.com'],
+  methods: ['GET','POST','PUT','DELETE'],
   credentials: true
 }));
 
@@ -62,13 +63,41 @@ app.get('/api/health', (req, res) => {
 });
 
 // Contact form submission
-app.post('/api/contact', async (req, res) => {
+app.post("/api/contact", async (req, res) => {
   try {
+    console.log("📩 Contact form data:", req.body);
+
     const { firstName, lastName, email, phone, subject, message } = req.body;
 
-    if (!firstName || !lastName || !email || !phone || !message) {
-      return res.status(400).json({ error: 'All fields are required' });
+    const mailOptions = {
+      from: process.env.SMTP_USER,
+      to: process.env.RECEIVER_EMAIL,
+      subject: `NGO Website Contact Form: ${subject}`,
+      text: `
+        Name: ${firstName} ${lastName}
+        Email: ${email}
+        Phone: ${phone}
+        Subject: ${subject}
+        Message: ${message}
+      `,
+    };
+
+    // Try sending email
+    try {
+      await transporter.sendMail(mailOptions);
+      console.log("✅ Email sent");
+      res.json({ success: true, message: "Email sent successfully" });
+    } catch (err) {
+      console.error("❌ Email send failed:", err.message);
+      // Still respond so frontend doesn’t hang
+      res.status(500).json({ success: false, message: "Failed to send email" });
     }
+  } catch (err) {
+    console.error("❌ Contact route error:", err.message);
+    res.status(500).json({ success: false, message: "Server error" });
+  }
+});
+
 
     // Email to user (confirmation)
     const userMailOptions = {
@@ -171,15 +200,40 @@ app.post('/api/contact', async (req, res) => {
 });
 
 // Donation confirmation
-app.post('/api/donation-confirmation', async (req, res) => {
+app.post("/api/donate", async (req, res) => {
   try {
-    const { donorName, donorEmail, amount, donationType, phone, pan } = req.body;
+    console.log("💰 Donation form data:", req.body);
 
-    if (!donorName || !donorEmail || !amount) {
-      return res.status(400).json({ error: 'Required fields missing' });
+    const { name, email, phone, amount, message } = req.body;
+
+    const mailOptions = {
+      from: process.env.SMTP_USER,
+      to: process.env.RECEIVER_EMAIL,
+      subject: "New Donation Request",
+      text: `
+        Name: ${name}
+        Email: ${email}
+        Phone: ${phone}
+        Amount: ₹${amount}
+        Message: ${message}
+      `,
+    };
+
+    // Try sending email
+    try {
+      await transporter.sendMail(mailOptions);
+      console.log("✅ Donation email sent");
+      res.json({ success: true, message: "Donation email sent successfully" });
+    } catch (err) {
+      console.error("❌ Donation email failed:", err.message);
+      // Important: still send a response
+      res.status(500).json({ success: false, message: "Failed to send donation email" });
     }
-
-    const receiptNumber = `NGO-${Date.now()}`;
+  } catch (err) {
+    console.error("❌ Donation route error:", err.message);
+    res.status(500).json({ success: false, message: "Server error" });
+  }
+});
 
     // Email to donor (confirmation)
     const donorMailOptions = {
