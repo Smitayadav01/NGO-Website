@@ -23,6 +23,13 @@ app.use(limiter);
 // CORS configuration
 app.use(cors({
   origin: 'https://www.hrslifecharitabletrust.com',
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  credentials: true
+}));
+
+// Optional: handle preflight requests
+app.options('*', cors({
+  origin: 'https://www.hrslifecharitabletrust.com',
   credentials: true
 }));
 
