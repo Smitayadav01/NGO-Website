@@ -62,7 +62,15 @@ app.get('/api/health', (req, res) => {
   });
 });
 
+// ✅ Test route
+app.get("/api/ping", (req, res) => {
+  console.log("✅ /api/ping hit");
+  res.json({ success: true, message: "Backend is alive 🚀" });
+});
+
+
 // Contact form submission
+// ✅ CONTACT ROUTE
 app.post("/api/contact", async (req, res) => {
   try {
     console.log("📩 Contact form data:", req.body);
@@ -72,7 +80,7 @@ app.post("/api/contact", async (req, res) => {
     const mailOptions = {
       from: process.env.SMTP_USER,
       to: process.env.RECEIVER_EMAIL,
-      subject: `NGO Website Contact Form: ${subject}`,
+      subject: `📩 New Contact Form Submission: ${subject || "No Subject"}`,
       text: `
         Name: ${firstName} ${lastName}
         Email: ${email}
@@ -82,21 +90,47 @@ app.post("/api/contact", async (req, res) => {
       `,
     };
 
-    // Try sending email
-    try {
-      await transporter.sendMail(mailOptions);
-      console.log("✅ Email sent");
-      res.json({ success: true, message: "Email sent successfully" });
-    } catch (err) {
-      console.error("❌ Email send failed:", err.message);
-      // Still respond so frontend doesn’t hang
-      res.status(500).json({ success: false, message: "Failed to send email" });
-    }
+    await transporter.sendMail(mailOptions);
+    console.log("✅ Contact email sent successfully");
+    res.json({ success: true, message: "Contact form submitted successfully" });
+
   } catch (err) {
-    console.error("❌ Contact route error:", err.message);
-    res.status(500).json({ success: false, message: "Server error" });
+    console.error("❌ Contact email failed:", err.message);
+    res.status(500).json({ success: false, message: "Failed to send contact email" });
   }
 });
+
+
+// ✅ DONATION ROUTE
+app.post("/api/donate", async (req, res) => {
+  try {
+    console.log("💰 Donation form data:", req.body);
+
+    const { name, email, phone, amount, message } = req.body;
+
+    const mailOptions = {
+      from: process.env.SMTP_USER,
+      to: process.env.RECEIVER_EMAIL,
+      subject: "💰 New Donation Request",
+      text: `
+        Name: ${name}
+        Email: ${email}
+        Phone: ${phone}
+        Amount: ₹${amount}
+        Message: ${message}
+      `,
+    };
+
+    await transporter.sendMail(mailOptions);
+    console.log("✅ Donation email sent successfully");
+    res.json({ success: true, message: "Donation email sent successfully" });
+
+  } catch (err) {
+    console.error("❌ Donation email failed:", err.message);
+    res.status(500).json({ success: false, message: "Failed to send donation email" });
+  }
+});
+
 
 
     // Email to user (confirmation)
