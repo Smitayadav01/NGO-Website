@@ -12,7 +12,7 @@ const Donate = () => {
   const [selectedAmount, setSelectedAmount] = useState('1000');
   const [customAmount, setCustomAmount] = useState('');
   const [donationType, setDonationType] = useState('one-time');
-  const [donorInfo, setDonorInfo] = useState({ name: '', email: '', phone: '', pan: '' });
+  const [donorInfo, setDonorInfo] = useState({ name: '', email: '', phone: '', pan: '',amount:'', message:''});
   const [showThankYou, setShowThankYou] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
 
@@ -43,7 +43,7 @@ const Donate = () => {
     const amount = customAmount || selectedAmount;
 
     // Validation
-    if (!donorInfo.name || !donorInfo.email || !donorInfo.phone) {
+    if (!donorInfo.name || !donorInfo.email || !donorInfo.phone || !donorInfo.amount || !donorInfo.pan || !donorInfo.message ) {
       alert('Please fill in all required fields (Name, Email, Phone)');
       return;
     }

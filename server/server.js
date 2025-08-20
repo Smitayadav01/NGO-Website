@@ -128,7 +128,7 @@ app.post("/api/contact", async (req, res) => {
 });
 
 /* -------------------- DONATION ROUTE -------------------- */
-app.post("/api/donate", async (req, res) => {
+app.post("/api/donation-confirmation", async (req, res) => {
   try {
     const { name, email, phone, amount, message, pan, donationType } = req.body;
     if (!name || !email || !amount) {
@@ -200,6 +200,7 @@ app.post("/api/volunteer", async (req, res) => {
       email,
       phone,
       age,
+      message,
       occupation,
       experience,
       availability,
@@ -207,7 +208,7 @@ app.post("/api/volunteer", async (req, res) => {
       motivation,
     } = req.body;
 
-    if (!firstName || !lastName || !email || !phone || !availability || !motivation) {
+    if (!firstName || !lastName || !email || !phone || !message) {
       return res.status(400).json({ error: "Required fields are missing" });
     }
 
